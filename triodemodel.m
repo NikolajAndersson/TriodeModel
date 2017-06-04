@@ -5,7 +5,7 @@ clear; clc; close all;
 Fs = 44100;
 N = 10000;
 
-gain = 250; % input signal gain parameter
+gain = 1; % input signal gain parameter
 f0 = 1000; % excitation frequency (Hz)
 t = 1:N; % time vector for the excitation
  %input = [zeros(1,500),gain.*sin(2*pi*f0/Fs.*t)]; % the excitation signal
@@ -32,18 +32,18 @@ A4 = Series(A2,A3)
 
 Vk = 0;
 Vg = -2;
-Vpk = 250;
+Vpk = 100;
 
 triodePortRes = A4.PortRes;
 
 for n = 1:N % run each time sample until N
-    V.E = input(n); % read the input signal for the voltage source
+    %V.E = input(n); % read the input signal for the voltage source
     a = WaveUp(A4);  % get the waves up to the root
 
     % Triode calculations
     % 1. get Vgk(n) = Vg(n) - Vk(n-1)
-    Vg = 10;%input(n); % ?
-    Vgk = Vg + (-Vk);
+    Vg = input(n); % ?
+    Vgk = Vg - Vk;
     
     [b, Vpk] = triodeNL(a, triodePortRes, Vgk, Vpk);
     %Vpk = newV
@@ -57,9 +57,12 @@ for n = 1:N % run each time sample until N
     output(n) = Voltage(R0); % the output is the voltage over the parallel adaptor A2
     output2(n) = Voltage(Rk);
 end
-
-plot(output);% hold on; plot(pVpk)
-figure; plot(output2)
+subplot(3,1,1);
+plot(output); title('output')
+subplot(3,1,2);
+plot(pVpk); title('Vpk')
+subplot(3,1,3);
+ plot(output2); title('Vk')
 
 %% Test Triode
 

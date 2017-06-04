@@ -9,17 +9,19 @@ epsilon = 1e-9; % a value close to 0 to stop the iteration if the equation is co
 
 iter = 1;        % reset iter to 1
 % Newton-Raphson algorithm
-while (abs(err) / abs(Vpk) > epsilon )
-    pVpk(iter) = Vpk; 
-    f = Vpk + R0 * getIp(Vgk,Vpk) - a; % (7)
-    df = (Vpk + dx) + R0 * getIp(Vgk, (Vpk + dx)) - a;
-    newVpk = Vpk - (dx*f)/(df - f); 
-    Vpk = newVpk;
+x = Vpk;
+while (abs(err) / abs(x) > epsilon )
+    pVpk(iter) = x; 
+    f = x + R0 * getIp(Vgk,x) - a; % (7)
+    df = (x + dx) + R0 * getIp(Vgk, (x + dx)) - a;
+    newVpk = x - (dx*f)/(df - f); 
+    x = newVpk;
     iter = iter + 1;
     if (iter > maxIter)         % if iter is larger than the maximum nr of iterations
         break;                  % break out from the while loop
     end
 end
+Vpk = x;
 %plot(pVpk);
 b = Vpk - R0 * getIp(Vgk,Vpk);
 
