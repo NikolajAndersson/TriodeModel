@@ -1,6 +1,7 @@
 % Enhanced triode model
 % Enhanced Wave Digital Triode Model for Real-Time Tube Amplifier Emulation
 % by J. Pakarinen and M. Karjalainen
+% needs Diode, adaptTree and NL root
 Fs = 44100;
 N = 10000;
 
@@ -23,14 +24,14 @@ Ck = Capacitor(10e-6, Fs)
 A4 = Series(Rk,Ck)
 
 % Plate
-V = VoltageSource(250,100e3)
+V = TerminatedVs(250,100e3)
 C0 = Capacitor(10e-9,Fs)
 R0 = Resistor(8);
 T = IdealTransformer(R0,100)
 
 A4 = Series(C0, T)
 A5 = Parallel(V,A4)
-
+diode = Diode(1)
 % Grid to Triode Need this part
 A6 = Series(A3, diode)
 % Cathode to triode
