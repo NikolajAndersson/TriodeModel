@@ -12,7 +12,7 @@ classdef TriodeRT < audioPlugin
         PluginInterface = audioPluginInterface(...
             audioPluginParameter('mix','DisplayName','Mix','Label','','Mapping',{'lin',0 1}),...
             audioPluginParameter('dist','DisplayName','Distortion','Label','','Mapping',{'lin',0.1 20}),...
-            audioPluginParameter('gain','DisplayName','Gain','Label','','Mapping',{'lin',0 1}));
+            audioPluginParameter('gain','DisplayName','Gain','Label','','Mapping',{'lin',0 3}));
     end
     
     properties (Access = private)
@@ -116,8 +116,8 @@ classdef TriodeRT < audioPlugin
                 
                 output(n,:) = Voltage(obj.R0);
             end
-            oScale = output/max(abs(output));
-            output = [oScale, oScale];%outputscale;
+            %oScale = output/max(abs(output));
+            %output = [oScale, oScale];
             out = output*obj.mix + (1-obj.mix)*x;
         end
     end
