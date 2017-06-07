@@ -1,15 +1,18 @@
 % WDF Triode model
 % WAVE DIGITAL SIMULATION OF A VACUUM-TUBE AMPLIFIER by Matti Karjalainen and Jyri Pakarinen
-clear; clc; close all;
+%clear; clc; close all;
 %V+ = 250 V, Rp = 100 k?, Ro = 1 M?, Co = 10 nF, Rk = 1 k?, Ck = 10 ?F
 Fs = 44100;
 N = 10000;
 
-gain = 1; % input signal gain parameter
+gain =  1;%250; % input signal gain parameter
 f0 = 1000; % excitation frequency (Hz)
 t = 1:N; % time vector for the excitation
- %input = [zeros(1,500),gain.*sin(2*pi*f0/Fs.*t)]; % the excitation signal
-input = [gain.*sin(2*pi*f0/Fs.*t)]; % the excitation signal
+ %input = [zeros(1,1000),gain.*sin(2*pi*f0/Fs.*t) zeros(1,1000)]; % the excitation signal
+
+% N = length(input)
+ 
+ input = [gain.*sin(2*pi*f0/Fs.*t)]; % the excitation signal
 
 output = zeros(1,length(input));
 
@@ -20,7 +23,7 @@ A1 = Series(C0,R0)
 
 V = TerminatedVs(250,100e3)
 
-A2 = Parallel(V,A1)
+A2 = Parallel(V, A1)
 
 Rk = Resistor(1e3)
 
@@ -28,21 +31,21 @@ Ck = Capacitor(10e-6,Fs)
 
 A3 = Parallel(Ck,Rk)
 
-A4 = Series(A2,A3)
+A4 = Series(A3,A2)
 
 Vk = 0;
-Vg = -2;
-Vpk = 100;
+Vg = 20;
+Vpk = 0;
 
-triodePortRes = A4.PortRes;
+triodePortRes = A1.PortRes;%(A4.KidLeft.PortRes *  A4.KidRight.PortRes)/(A4.KidLeft.PortRes + A4.KidRight.PortRes);
 
 for n = 1:N % run each time sample until N
-    %V.E = input(n); % read the input signal for the voltage source
+    V.E = input(n); %* 250; % read the input signal for the voltage source
     a = WaveUp(A4);  % get the waves up to the root
 
     % Triode calculations
     % 1. get Vgk(n) = Vg(n) - Vk(n-1)
-    Vg = input(n); % ?
+    %Vg = input(n) * 0.75; % ?
     Vgk = Vg - Vk;
     
     [b, Vpk] = triodeNL(a, triodePortRes, Vgk, Vpk);
@@ -57,12 +60,14 @@ for n = 1:N % run each time sample until N
     output(n) = Voltage(R0); % the output is the voltage over the parallel adaptor A2
     output2(n) = Voltage(Rk);
 end
-subplot(3,1,1);
-plot(output); title('output')
-subplot(3,1,2);
-plot(pVpk); title('Vpk')
-subplot(3,1,3);
- plot(output2); title('Vk')
+% subplot(3,1,1);
+% plot(output); title('output')
+% subplot(3,1,2);
+% plot(pVpk); title('Vpk')
+% subplot(3,1,3);
+%  plot(output2); title('B')
+ plot(output(1000:1200)); title('output')
+ hold on;
 
 %% Test Triode
 
@@ -86,3 +91,13 @@ for i = 1:length(Vpk)
 
 end
 plot(B); hold on; plot(B2); plot(B3); plot(B4);
+
+%% 
+
+syms x
+syms Vgk
+syms a
+syms Pr
+f = x + Pr * getIp(Vgk,x) - a
+
+diff(f,x)

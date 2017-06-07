@@ -1,7 +1,7 @@
-function [ b, Vpk ] = triodeNL(a, R0, Vgk,Vpk)
+function [ b, Vpk ] = triodeNL(a, R0, Vgk, Vpk)
 % 12AX7 model with New-Raphson solver
 % using Wave Digital Filters
-
+% 
 maxIter = 10;   % maximun number of iterations
 dx = 1e-6;      % delta x
 err =  1e-6;    % error
@@ -11,9 +11,10 @@ iter = 1;        % reset iter to 1
 % Newton-Raphson algorithm
 x = Vpk;
 while (abs(err) / abs(x) > epsilon )
-    pVpk(iter) = x; 
+    %pVpk(iter) = x; 
+    diffX = x + dx;
     f = x + R0 * getIp(Vgk,x) - a; % (7)
-    df = (x + dx) + R0 * getIp(Vgk, (x + dx)) - a;
+    df = diffX + R0 * getIp(Vgk, diffX) - a;
     newVpk = x - (dx*f)/(df - f); 
     x = newVpk;
     iter = iter + 1;
