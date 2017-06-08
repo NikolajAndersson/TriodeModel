@@ -1,12 +1,12 @@
 function [ b, Vpk ] = triodeNL(a, R0, Vgk, Vpk)
 % 12AX7 model with New-Raphson solver
 % using Wave Digital Filters
-% 
+% From WAVE DIGITAL SIMULATION OF A VACUUM-TUBE AMPLIFIER by Matti Karjalainen and Jyri Pakarinen
+
 maxIter = 5;   % maximun number of iterations
 dx = 1e-6;      % delta x
 err =  1e-6;    % error
 epsilon = 1e-9; % a value close to 0 to stop the iteration if the equation is converging
-
 iter = 1;        % reset iter to 1
 % Newton-Raphson algorithm
 x = Vpk;
@@ -22,7 +22,7 @@ while (abs(err) / abs(x) > epsilon )
     end
 end
 Vpk = x;
-b = Vpk - R0 * getIp(Vgk,Vpk);
+b = Vpk - R0 * getIp(Vgk,Vpk); % (8)
 
 end
 

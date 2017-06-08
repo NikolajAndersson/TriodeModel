@@ -1,5 +1,5 @@
 classdef TriodeRT < audioPlugin
-    
+% Triode model from WAVE DIGITAL SIMULATION OF A VACUUM-TUBE AMPLIFIER by Matti Karjalainen and Jyri Pakarinen    
     properties
         gain = 1
         dist = 1
@@ -17,34 +17,28 @@ classdef TriodeRT < audioPlugin
     
     properties (Access = private)
         pSR
-        
+        % initialise component variables
         R0
-        C0
-        
+        C0       
         A1
-        V
-        
+        V       
         A2
-        
-        Rk
-        
+        Rk        
         Ck
-        
         A3
-        
         A4
-        
+        % and other private variables
         triodePortRes
         
         Vk = 0;
-        Vpk = 0;
-        
+        Vpk = 0;      
     end
     
     methods
         function obj = TriodeRT()
             obj.pSR = getSampleRate(obj);
             Fs = obj.pSR;
+            % Build Circuit
             obj.R0 = Resistor(1e6);
             obj.C0 = Capacitor(10e-9, Fs);
             
@@ -61,63 +55,34 @@ classdef TriodeRT < audioPlugin
             obj.A3 = Parallel(obj.Ck,obj.Rk);
             
             obj.A4 = Series(obj.A3,obj.A2);
-            obj.triodePortRes = obj.A1.PortRes;%(A4.KidLeft.PortRes *  A4.KidRight.PortRes)/(A4.KidLeft.PortRes + A4.KidRight.PortRes);
-            
-        end
-%         function b = solveNL(obj, a, R, Vgk)
-%             maxIter = 5;   % maximun number of iterations
-%             dx = 1e-6;      % delta x
-%             err =  1e-6;    % error
-%             epsilon = 1e-9; % a value close to 0 to stop the iteration if the equation is converging
-%             
-%             iter = 1;        % reset iter to 1
-%             % Newton-Raphson algorithm
-%             x = obj.Vpk;
-%             while (abs(err) / abs(x) > epsilon )
-%                 diffX = x + dx;
-%                 f = x + R * getIp(Vgk, x) - a; % (7)
-%                 df = diffX + R * getIp(Vgk, diffX) - a;
-%                 newVpk = x - (dx*f)/(df - f);
-%                 x = newVpk;
-%                 iter = iter + 1;
-%                 if (iter > maxIter)         % if iter is larger than the maximum nr of iterations
-%                     break;                  % break out from the while loop
-%                 end
-%             end
-%             obj.Vpk = x;
-%             %plot(pVpk);
-%             b = obj.Vpk - R * getIp(Vgk,obj.Vpk);
-%         end
-        
+            % R0 port resistance
+            obj.triodePortRes = obj.A1.PortRes;
+        end      
         function reset(obj)
-            obj.pSR = getSampleRate(obj);
-            
+            obj.pSR = getSampleRate(obj);           
         end
         
         function out = process(obj, x)
             [numSamples,m] = size(x);
             output = zeros(size(x));
             input = obj.gain*sum(x,m)/m;
-            %input = x(:,1);
-            Vg = obj.dist;
-            
+            Vg = obj.dist;            
             for n = 1:numSamples % run each time sample until N
                 obj.V.E = input(n); % read the input signal for the voltage source
                 a = WaveUp(obj.A4);
-                
+                % Calculate Vgk
                 Vgk = Vg - obj.Vk;
-                
+                % Nonlinear triode calculations goes in here
                 [b, z] = triodeNL(a, obj.triodePortRes, Vgk, complex(obj.Vpk));
                 obj.Vpk = real(z);
-             
+                % Send the wave down the tree
                 WaveDown(obj.A4, real(b));
                 % update Vk, unit delay
                 obj.Vk = Voltage(obj.Rk);
-                
+                % Read output voltage at R0
                 output(n,:) = Voltage(obj.R0);
             end
-            %oScale = output/max(abs(output));
-            %output = [oScale, oScale];
+            % Mix clean and dirty sound
             out = output*obj.mix + (1-obj.mix)*x;
         end
     end
