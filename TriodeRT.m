@@ -69,7 +69,8 @@ classdef TriodeRT < audioPlugin
             Vg = obj.dist;            
             for n = 1:numSamples % run each time sample until N
                 obj.V.E = input(n); % read the input signal for the voltage source
-                a = WaveUp(obj.A4);
+                % Calculate up-going waves
+                a = WaveUp(obj.A4); 
                 % Calculate Vgk
                 Vgk = Vg - obj.Vk;
                 % Nonlinear triode calculations goes in here

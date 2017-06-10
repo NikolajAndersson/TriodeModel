@@ -1,7 +1,7 @@
 % WDF Triode model
 % WAVE DIGITAL SIMULATION OF A VACUUM-TUBE AMPLIFIER by Matti Karjalainen and Jyri Pakarinen
-%clear; clc; close all;
-%V+ = 250 V, Rp = 100 k?, Ro = 1 M?, Co = 10 nF, Rk = 1 k?, Ck = 10 ?F
+clear; clc; close all;
+%V+ = 250 V, Rp = 100 kOhm, Ro = 1 MOhm, Co = 10 nF, Rk = 1 kOhm, Ck = 10 uF
 Fs = 44100;
 N = 10000;
 
@@ -61,6 +61,8 @@ for n = 1:N % run each time sample until N
     output2(n) = Voltage(Rk);
 end
 subplot(3,1,1);
+grid on; % use the grid for clarity
+
 plot(input); title('Input', 'FontSize', 18)
 
 subplot(3,1,2);
@@ -69,7 +71,9 @@ plot(output2); title('Voltage over Rk', 'FontSize', 18)
 subplot(3,1,3);
 plot(output); title('Output (Voltage over R0)', 'FontSize', 18)
 figure
-plot(output(2000:2150)); title('output', 'FontSize', 18)
+plot(output); title('Output', 'FontSize', 18)
+grid on; % use the grid for clarity
+
 xlabel('Samples',  'FontSize', 14)
 ylabel('Voltage from R0', 'FontSize', 14)
 %hold on;
