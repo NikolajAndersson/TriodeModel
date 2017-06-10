@@ -1,5 +1,5 @@
 classdef TriodeRT < audioPlugin
-% Triode model from WAVE DIGITAL SIMULATION OF A VACUUM-TUBE AMPLIFIER by Matti Karjalainen and Jyri Pakarinen    
+% Vacuum-tube model from WAVE DIGITAL SIMULATION OF A VACUUM-TUBE AMPLIFIER by Matti Karjalainen and Jyri Pakarinen    
     properties
         gain = 1
         dist = 1
@@ -59,7 +59,7 @@ classdef TriodeRT < audioPlugin
             obj.triodePortRes = obj.A1.PortRes;
         end      
         function reset(obj)
-            obj.pSR = getSampleRate(obj);           
+            obj.pSR = getSampleRate(obj);   
         end
         
         function out = process(obj, x)
